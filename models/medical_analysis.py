@@ -52,12 +52,12 @@ def analyze_ekg_with_llm(ekg_signal, model="llama3"):
     Sendet EKG-Daten an ein lokales LLM via Ollama zur medizinischen Analyse (Antwort auf Deutsch).
     """
     summary = f"Max: {ekg_signal.max():.2f}, Min: {ekg_signal.min():.2f}, Mittelwert: {ekg_signal.mean():.2f}"
-    signal_str = ", ".join([f"{v:.2f}" for v in ekg_signal[:100]])  # max. 100 Werte als Beispiel
+    signal_str = ", ".join([f"{v:.2f}" for v in ekg_signal])
 
     prompt = (
         "Hier sind EKG-Daten einer Apple Watch als Mikrovolt-Zeitreihe.\n"
         f"Zusammenfassung: {summary}\n"
-        f"Signal (erste 100 Werte): {signal_str}\n"
+        f"Signal ({len(ekg_signal)} Werte): {signal_str}\n"
         "Bitte analysiere das Signal medizinisch und gib Hinweise auf mögliche Auffälligkeiten. "
         "Antworte ausschließlich auf Deutsch."
     )
