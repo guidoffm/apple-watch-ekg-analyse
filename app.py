@@ -11,42 +11,49 @@ uploaded_file = st.file_uploader("Wähle eine Apple Watch EKG-Datei (CSV) zum Ho
 if uploaded_file is not None:
     content = uploaded_file.read().decode("utf-8")
     sampling_rate = None
+    metadata = {}
     lines = content.splitlines()
     data_lines = []
+    
     for line in lines:
         line = line.strip()
-        if line.lower().startswith("messrate"):
-            try:
-                parts = line.split(",")
-                if len(parts) > 1:
-                    sampling_rate = float(parts[1].split()[0].replace(",", "."))
-            except Exception:
-                pass
-        elif line.lower().startswith("samplingrate") or line.lower().startswith("sampling_rate"):
-            try:
-                sampling_rate = float(line.split(":")[1].strip())
-            except Exception:
-                pass
-        if line.replace('.', '', 1).replace(',', '', 1).replace('-', '', 1).isdigit():
+        if "," in line and not line.replace('.', '', 1).replace(',', '', 1).replace('-', '', 1).isdigit():
+            parts = line.split(",", 1)
+            if len(parts) == 2:
+                key, value = parts[0].strip(), parts[1].strip().strip('"')
+                metadata[key] = value
+                if key.lower() == "messrate":
+                    try:
+                        sampling_rate = float(value.split()[0])
+                    except:
+                        pass
+        elif line.replace('.', '', 1).replace(',', '', 1).replace('-', '', 1).isdigit():
             data_lines.append(line.replace(',', '.'))
+    # Metadaten anzeigen
+    if metadata:
+        st.subheader("Metadaten")
+        for key, value in metadata.items():
+            st.write(f"**{key}:** {value}")
+    
     if not data_lines:
         st.error("Keine Messwerte gefunden. Bitte prüfe die Datei.")
     else:
         ekg_signal = pd.Series([float(val) for val in data_lines])
+        st.subheader("Signalanalyse")
         st.write("Anzahl Messwerte:", len(ekg_signal))
         if sampling_rate:
             st.write(f"Messrate: {sampling_rate} Hz")
         else:
             st.warning("Messrate konnte nicht aus den Metadaten gelesen werden. X-Achse zeigt Samples.")
 
-        st.write("Einfache Analyse:")
+        st.write("**Einfache Analyse:**")
         st.write(f"Maximalwert: {ekg_signal.max():.2f} µV")
         st.write(f"Minimalwert: {ekg_signal.min():.2f} µV")
         st.write(f"Mittelwert: {ekg_signal.mean():.2f} µV")
 
         # Medizinische Analyse
         analysis_results = analyze_ekg(ekg_signal)
-        st.write("Medizinische Analyse Ergebnisse:")
+        st.write("**Medizinische Analyse Ergebnisse:**")
         for key, value in analysis_results.items():
             st.write(f"{key}: {value}")
 
@@ -66,7 +73,7 @@ if uploaded_file is not None:
         if st.session_state.llm_running:
             with st.spinner("LLM-Analyse läuft..."):
                 llm_result = analyze_ekg_with_llm(ekg_signal)
-                st.write("LLM-Analyse:")
+                st.write("**LLM-Analyse:**")
                 st.write(llm_result)
             st.session_state.llm_running = False
 
