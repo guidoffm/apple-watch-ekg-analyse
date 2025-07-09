@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import requests
+import os
 
 def detect_arrhythmias(ekg_signal):
     """
@@ -61,8 +62,9 @@ def analyze_ekg_with_llm(ekg_signal, model="llama3"):
         "Antworte ausschließlich auf Deutsch."
     )
 
+    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
     response = requests.post(
-        "http://localhost:11434/api/generate",
+        f"{ollama_url}/api/generate",
         json={
             "model": model,
             "prompt": prompt,

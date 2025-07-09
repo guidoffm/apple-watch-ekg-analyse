@@ -4,3 +4,5 @@
     . ./.venv/bin/activate
 
     pip install -r requirements.txt
+
+    docker compose up --remove-orphans streamlit
