@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import openai
+import requests
 
 def detect_arrhythmias(ekg_signal):
     """
@@ -46,27 +46,30 @@ def analyze_ekg(ekg_signal):
     
     return analysis_results
 
-def analyze_ekg_with_llm(ekg_signal, api_key, model="gpt-4o"):
+def analyze_ekg_with_llm(ekg_signal, model="llama3"):
     """
-    Sendet EKG-Daten an ein LLM zur medizinischen Analyse.
+    Sendet EKG-Daten an ein lokales LLM via Ollama zur medizinischen Analyse (Antwort auf Deutsch).
     """
-    # Optional: Nur die wichtigsten Kennzahlen oder einen Ausschnitt schicken
     summary = f"Max: {ekg_signal.max():.2f}, Min: {ekg_signal.min():.2f}, Mittelwert: {ekg_signal.mean():.2f}"
-    # Oder: Die Rohdaten als Liste (bei kurzen Signalen)
     signal_str = ", ".join([f"{v:.2f}" for v in ekg_signal[:100]])  # max. 100 Werte als Beispiel
 
     prompt = (
         "Hier sind EKG-Daten einer Apple Watch als Mikrovolt-Zeitreihe.\n"
         f"Zusammenfassung: {summary}\n"
         f"Signal (erste 100 Werte): {signal_str}\n"
-        "Bitte analysiere das Signal medizinisch und gib Hinweise auf mögliche Auffälligkeiten."
+        "Bitte analysiere das Signal medizinisch und gib Hinweise auf mögliche Auffälligkeiten. "
+        "Antworte ausschließlich auf Deutsch."
     )
 
-    response = openai.ChatCompletion.create(
-        model=model,
-        api_key=api_key,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.2,
-        max_tokens=500
+    response = requests.post(
+        "http://localhost:11434/api/generate",
+        json={
+            "model": model,
+            "prompt": prompt,
+            "stream": False
+        },
+        timeout=120
     )
-    return response.choices[0].message["content"]
+    response.raise_for_status()
+    result = response.json()
+    return result.get("response", "Keine Antwort vom Modell erhalten.")
