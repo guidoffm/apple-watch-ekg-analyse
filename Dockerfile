@@ -1,5 +1,7 @@
 FROM python:3.12-slim
 
+RUN useradd -m -u 1000 appuser
+
 WORKDIR /app
 
 COPY requirements.txt ./
@@ -9,6 +11,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     rm -rf /var/lib/apt/lists/*
 
 COPY . .
+RUN chown -R appuser:appuser /app
+
+USER appuser
 
 EXPOSE 8501
 
