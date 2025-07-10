@@ -6,6 +6,7 @@ import requests
 import os
 import json
 from models.medical_analysis import analyze_ekg, analyze_ekg_with_llm
+from utils.csv_parser import parse_apple_watch_csv
 
 @st.cache_data
 def load_i18n():
@@ -49,36 +50,16 @@ uploaded_file = st.file_uploader(t("file_uploader", language), type=["csv"])
 
 if uploaded_file is not None:
     content = uploaded_file.read().decode("utf-8")
-    sampling_rate = None
-    metadata = {}
-    lines = content.splitlines()
-    data_lines = []
-    
-    for line in lines:
-        line = line.strip()
-        if "," in line and not line.replace('.', '', 1).replace(',', '', 1).replace('-', '', 1).isdigit():
-            parts = line.split(",", 1)
-            if len(parts) == 2:
-                key, value = parts[0].strip(), parts[1].strip().strip('"')
-                metadata[key] = value
-                if key.lower() == "messrate":
-                    try:
-                        rate_str = value.split()[0].replace(',', '.')
-                        sampling_rate = float(rate_str)
-                    except:
-                        pass
-        elif line.replace('.', '', 1).replace(',', '', 1).replace('-', '', 1).isdigit():
-            data_lines.append(line.replace(',', '.'))
+    metadata, ekg_signal, sampling_rate = parse_apple_watch_csv(content)
     # Metadaten anzeigen
     if metadata:
         st.subheader(t("metadata", language))
         for key, value in metadata.items():
             st.write(f"**{key}:** {value}")
     
-    if not data_lines:
+    if ekg_signal.empty:
         st.error(t("no_data_error", language))
     else:
-        ekg_signal = pd.Series([float(val) for val in data_lines])
         st.subheader(t("signal_analysis", language))
         st.write(t("measurement_count", language), len(ekg_signal))
         if sampling_rate:
