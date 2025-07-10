@@ -25,7 +25,20 @@
     "time_samples": "Zeit (Samples)",
     "voltage": "Spannung (µV)",
     "ekg_signal_title": "EKG-Signal (Apple Watch)",
-    "prompt_template": "Hier sind EKG-Daten einer Apple Watch als Mikrovolt-Zeitreihe.\\nZusammenfassung: {summary}\\nSignal ({count} Werte): {signal}\\nBitte analysiere das Signal medizinisch und gib Hinweise auf mögliche Auffälligkeiten. Antworte ausschließlich auf Deutsch."
+    "prompt_template": "Hier sind EKG-Daten einer Apple Watch als Mikrovolt-Zeitreihe.\\nZusammenfassung: {summary}\\nSignal ({count} Werte): {signal}\\nBitte analysiere das Signal medizinisch und gib Hinweise auf mögliche Auffälligkeiten. Antworte ausschließlich auf Deutsch.",
+    "image_analysis_title": "Bild-Analyse",
+    "image_uploader": "Wählen Sie ein Bild zum Hochladen",
+    "uploaded_image_caption": "Hochgeladenes Bild",
+    "image_prompt_label": "Prompt für Bildanalyse:",
+    "image_prompt_template": "Analysiere dieses Bild medizinisch. Beschreibe was du siehst und gib Hinweise auf mögliche medizinische Befunde. Antworte auf Deutsch.",
+    "available_vision_models": "Verfügbare Vision-Modelle:",
+    "start_image_analysis": "Bild-Analyse starten",
+    "image_analysis_running": "Bild-Analyse läuft ({model})...",
+    "image_analysis_results": "Bild-Analyse:",
+    "menu_select": "Wählen Sie eine Analyse:",
+    "menu_ekg": "Apple Watch EKG-Analyse",
+    "menu_image": "Bild-Analyse",
+    "language_selector": "Sprache:"
   },
   "en": {
     "title": "Apple Watch ECG Analysis (Original Format)",
@@ -53,7 +66,20 @@
     "time_samples": "Time (Samples)",
     "voltage": "Voltage (µV)",
     "ekg_signal_title": "ECG Signal (Apple Watch)",
-    "prompt_template": "Here is ECG data from an Apple Watch as a microvolt time series.\\nSummary: {summary}\\nSignal ({count} values): {signal}\\nPlease analyze the signal medically and provide hints about possible abnormalities. Answer exclusively in English."
+    "prompt_template": "Here is ECG data from an Apple Watch as a microvolt time series.\\nSummary: {summary}\\nSignal ({count} values): {signal}\\nPlease analyze the signal medically and provide hints about possible abnormalities. Answer exclusively in English.",
+    "image_analysis_title": "Image Analysis",
+    "image_uploader": "Choose an image to upload",
+    "uploaded_image_caption": "Uploaded Image",
+    "image_prompt_label": "Prompt for image analysis:",
+    "image_prompt_template": "Analyze this image medically. Describe what you see and provide hints about possible medical findings. Answer in English.",
+    "available_vision_models": "Available Vision Models:",
+    "start_image_analysis": "Start Image Analysis",
+    "image_analysis_running": "Image analysis running ({model})...",
+    "image_analysis_results": "Image Analysis:",
+    "menu_select": "Choose an analysis:",
+    "menu_ekg": "Apple Watch ECG Analysis",
+    "menu_image": "Image Analysis",
+    "language_selector": "Language:"
   },
   "es": {
     "title": "Análisis de ECG de Apple Watch (Formato Original)",
@@ -81,7 +107,20 @@
     "time_samples": "Tiempo (Muestras)",
     "voltage": "Voltaje (µV)",
     "ekg_signal_title": "Señal ECG (Apple Watch)",
-    "prompt_template": "Aquí están los datos de ECG de un Apple Watch como una serie temporal de microvolts.\\nResumen: {summary}\\nSeñal ({count} valores): {signal}\\nPor favor analiza la señal médicamente y proporciona indicaciones sobre posibles anomalías. Responde exclusivamente en español."
+    "prompt_template": "Aquí están los datos de ECG de un Apple Watch como una serie temporal de microvolts.\\nResumen: {summary}\\nSeñal ({count} valores): {signal}\\nPor favor analiza la señal médicamente y proporciona indicaciones sobre posibles anomalías. Responde exclusivamente en español.",
+    "image_analysis_title": "Análisis de Imagen",
+    "image_uploader": "Elige una imagen para subir",
+    "uploaded_image_caption": "Imagen Subida",
+    "image_prompt_label": "Prompt para análisis de imagen:",
+    "image_prompt_template": "Analiza esta imagen médicamente. Describe lo que ves y proporciona indicaciones sobre posibles hallazgos médicos. Responde en español.",
+    "available_vision_models": "Modelos de Visión Disponibles:",
+    "start_image_analysis": "Iniciar Análisis de Imagen",
+    "image_analysis_running": "Análisis de imagen ejecutándose ({model})...",
+    "image_analysis_results": "Análisis de Imagen:",
+    "menu_select": "Elige un análisis:",
+    "menu_ekg": "Análisis ECG Apple Watch",
+    "menu_image": "Análisis de Imagen",
+    "language_selector": "Idioma:"
   },
   "fr": {
     "title": "Analyse ECG Apple Watch (Format Original)",
@@ -109,7 +148,20 @@
     "time_samples": "Temps (Échantillons)",
     "voltage": "Tension (µV)",
     "ekg_signal_title": "Signal ECG (Apple Watch)",
-    "prompt_template": "Voici les données ECG d'une Apple Watch sous forme de série temporelle en microvolts.\\nRésumé: {summary}\\nSignal ({count} valeurs): {signal}\\nVeuillez analyser le signal médicalement et donner des indications sur d'éventuelles anomalies. Répondez exclusivement en français."
+    "prompt_template": "Voici les données ECG d'une Apple Watch sous forme de série temporelle en microvolts.\\nRésumé: {summary}\\nSignal ({count} valeurs): {signal}\\nVeuillez analyser le signal médicalement et donner des indications sur d'éventuelles anomalies. Répondez exclusivement en français.",
+    "image_analysis_title": "Analyse d'Image",
+    "image_uploader": "Choisissez une image à télécharger",
+    "uploaded_image_caption": "Image Téléchargée",
+    "image_prompt_label": "Prompt pour l'analyse d'image:",
+    "image_prompt_template": "Analysez cette image médicalement. Décrivez ce que vous voyez et donnez des indications sur d'éventuels résultats médicaux. Répondez en français.",
+    "available_vision_models": "Modèles de Vision Disponibles:",
+    "start_image_analysis": "Démarrer l'Analyse d'Image",
+    "image_analysis_running": "Analyse d'image en cours ({model})...",
+    "image_analysis_results": "Analyse d'Image:",
+    "menu_select": "Choisissez une analyse:",
+    "menu_ekg": "Analyse ECG Apple Watch",
+    "menu_image": "Analyse d'Image",
+    "language_selector": "Langue:"
   },
   "ru": {
     "title": "Анализ ЭКГ Apple Watch (Оригинальный формат)",
@@ -137,6 +189,19 @@
     "time_samples": "Время (образцы)",
     "voltage": "Напряжение (мкВ)",
     "ekg_signal_title": "Сигнал ЭКГ (Apple Watch)",
-    "prompt_template": "Вот данные ЭКГ с Apple Watch в виде временного ряда в микровольтах.\\nСводка: {summary}\\nСигнал ({count} значений): {signal}\\nПожалуйста, проанализируйте сигнал с медицинской точки зрения и дайте указания о возможных отклонениях. Отвечайте исключительно на русском языке."
+    "prompt_template": "Вот данные ЭКГ с Apple Watch в виде временного ряда в микровольтах.\\nСводка: {summary}\\nСигнал ({count} значений): {signal}\\nПожалуйста, проанализируйте сигнал с медицинской точки зрения и дайте указания о возможных отклонениях. Отвечайте исключительно на русском языке.",
+    "image_analysis_title": "Анализ Изображения",
+    "image_uploader": "Выберите изображение для загрузки",
+    "uploaded_image_caption": "Загруженное Изображение",
+    "image_prompt_label": "Промпт для анализа изображения:",
+    "image_prompt_template": "Проанализируйте это изображение с медицинской точки зрения. Опишите, что вы видите, и дайте указания о возможных медицинских находках. Отвечайте на русском языке.",
+    "available_vision_models": "Доступные Модели Зрения:",
+    "start_image_analysis": "Начать Анализ Изображения",
+    "image_analysis_running": "Выполняется анализ изображения ({model})...",
+    "image_analysis_results": "Анализ Изображения:",
+    "menu_select": "Выберите анализ:",
+    "menu_ekg": "Анализ ЭКГ Apple Watch",
+    "menu_image": "Анализ Изображения",
+    "language_selector": "Язык:"
   }
 }
