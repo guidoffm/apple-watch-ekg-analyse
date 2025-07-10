@@ -47,20 +47,23 @@ def analyze_ekg(ekg_signal):
     
     return analysis_results
 
-def analyze_ekg_with_llm(ekg_signal, model="llama3"):
+def analyze_ekg_with_llm(ekg_signal, model="llama3", custom_prompt=None):
     """
     Sendet EKG-Daten an ein lokales LLM via Ollama zur medizinischen Analyse (Antwort auf Deutsch).
     """
     summary = f"Max: {ekg_signal.max():.2f}, Min: {ekg_signal.min():.2f}, Mittelwert: {ekg_signal.mean():.2f}"
     signal_str = ", ".join([f"{v:.2f}" for v in ekg_signal])
 
-    prompt = (
-        "Hier sind EKG-Daten einer Apple Watch als Mikrovolt-Zeitreihe.\n"
-        f"Zusammenfassung: {summary}\n"
-        f"Signal ({len(ekg_signal)} Werte): {signal_str}\n"
-        "Bitte analysiere das Signal medizinisch und gib Hinweise auf mögliche Auffälligkeiten. "
-        "Antworte ausschließlich auf Deutsch."
-    )
+    if custom_prompt:
+        prompt = custom_prompt.replace("{summary}", summary).replace("{signal}", signal_str).replace("{count}", str(len(ekg_signal)))
+    else:
+        prompt = (
+            "Hier sind EKG-Daten einer Apple Watch als Mikrovolt-Zeitreihe.\n"
+            f"Zusammenfassung: {summary}\n"
+            f"Signal ({len(ekg_signal)} Werte): {signal_str}\n"
+            "Bitte analysiere das Signal medizinisch und gib Hinweise auf mögliche Auffälligkeiten. "
+            "Antworte ausschließlich auf Deutsch."
+        )
 
     ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
     response = requests.post(
