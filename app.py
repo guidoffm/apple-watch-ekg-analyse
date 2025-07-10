@@ -63,7 +63,8 @@ if uploaded_file is not None:
                 metadata[key] = value
                 if key.lower() == "messrate":
                     try:
-                        sampling_rate = float(value.split()[0])
+                        rate_str = value.split()[0].replace(',', '.')
+                        sampling_rate = float(rate_str)
                     except:
                         pass
         elif line.replace('.', '', 1).replace(',', '', 1).replace('-', '', 1).isdigit():
