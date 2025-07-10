@@ -70,7 +70,7 @@ def analyze_ekg_with_llm(ekg_signal, model="llama3"):
             "prompt": prompt,
             "stream": False
         },
-        timeout=120
+        timeout=600
     )
     response.raise_for_status()
     result = response.json()

@@ -2,7 +2,20 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objs as go
 import io
+import requests
+import os
 from models.medical_analysis import analyze_ekg, analyze_ekg_with_llm
+
+@st.cache_data(ttl=60)
+def get_ollama_models():
+    try:
+        ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+        response = requests.get(f"{ollama_url}/api/tags", timeout=5)
+        response.raise_for_status()
+        models = response.json().get("models", [])
+        return sorted([model["name"] for model in models])
+    except:
+        return ["llama3"]
 
 st.title("Apple Watch EKG-Analyse (Originalformat)")
 
@@ -58,24 +71,34 @@ if uploaded_file is not None:
             st.write(f"{key}: {value}")
 
         # LLM-Analyse
-        if "llm_running" not in st.session_state:
-            st.session_state.llm_running = False
+        st.subheader("LLM-Analyse")
+        
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            available_models = get_ollama_models()
+            selected_model = st.selectbox("Verfügbare Ollama-Modelle:", available_models)
+        
+        with col2:
+            if "llm_running" not in st.session_state:
+                st.session_state.llm_running = False
 
-        def start_llm():
-            st.session_state.llm_running = True
+            def start_llm():
+                st.session_state.llm_running = True
 
-        llm_button = st.button(
-            "LLM-Analyse starten",
-            disabled=st.session_state.llm_running,
-            on_click=start_llm
-        )
+            st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
+            llm_button = st.button(
+                "LLM-Analyse starten",
+                disabled=st.session_state.llm_running,
+                on_click=start_llm
+            )
 
         if st.session_state.llm_running:
-            with st.spinner("LLM-Analyse läuft..."):
-                llm_result = analyze_ekg_with_llm(ekg_signal)
+            with st.spinner(f"LLM-Analyse läuft ({selected_model})..."):
+                llm_result = analyze_ekg_with_llm(ekg_signal, model=selected_model)
+                st.session_state.llm_running = False
                 st.write("**LLM-Analyse:**")
                 st.write(llm_result)
-            st.session_state.llm_running = False
 
         # Interaktiver Plot mit Plotly
         st.subheader("Interaktiver EKG-Plot (mit Maus zoomen, Doppelklick oder Button zum Zurücksetzen)")
