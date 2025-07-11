@@ -21,6 +21,12 @@ def t(key, lang='de', **kwargs):
     return text.format(**kwargs) if kwargs else text
 
 VISION_MODELS = {"llava", "bakllava", "llava-phi3", "llava-llama3", "medgemma", "medllava"}
+HF_VISION_MODELS = [
+    "Salesforce/blip-image-captioning-base",
+    "Salesforce/blip-image-captioning-large",
+    "microsoft/git-base",
+    "microsoft/git-large"
+]
 
 @st.cache_data(ttl=60)
 def get_ollama_models():
@@ -35,6 +41,9 @@ def get_ollama_models():
 
 def filter_vision_models(models):
     return [m for m in models if any(vm in m.lower() for vm in VISION_MODELS)]
+
+def get_hf_vision_models():
+    return HF_VISION_MODELS
 
 # Sprachauswahl mit Browser-Speicherung
 if 'language' not in st.session_state:
@@ -183,11 +192,8 @@ elif menu_option == "image_analysis":
         col1, col2 = st.columns([2, 1])
         
         with col1:
-            available_models = get_ollama_models()
-            vision_models = filter_vision_models(available_models)
-            if not vision_models:
-                vision_models = available_models
-            selected_image_model = st.selectbox(t("available_vision_models", language), vision_models)
+            hf_models = get_hf_vision_models()
+            selected_image_model = st.selectbox(t("available_vision_models", language), hf_models)
         
         with col2:
             if "image_llm_running" not in st.session_state:

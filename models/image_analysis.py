@@ -1,39 +1,61 @@
-import base64
-import requests
-import os
+from transformers import BlipProcessor, BlipForConditionalGeneration
+from PIL import Image
+import io
+import torch
 
-def analyze_image_with_llm(image_bytes, model="llava", custom_prompt=None):
+# Global variables for model caching
+_processor = None
+_model = None
+
+def load_model(model_name="Salesforce/blip-image-captioning-base"):
     """
-    Sendet Bilddaten an ein lokales LLM via Ollama zur Bildanalyse.
+    Lädt das Hugging Face Vision-Modell.
+    """
+    global _processor, _model
+    if _processor is None or _model is None:
+        _processor = BlipProcessor.from_pretrained(model_name, use_fast=True)
+        _model = BlipForConditionalGeneration.from_pretrained(model_name)
+        
+        # GPU verwenden falls verfügbar
+        if torch.cuda.is_available():
+            _model = _model.cuda()
+    
+    return _processor, _model
+
+def analyze_image_with_llm(image_bytes, model="Salesforce/blip-image-captioning-base", custom_prompt=None):
+    """
+    Analysiert Bilddaten mit einem Hugging Face Vision-Modell.
     
     Args:
         image_bytes: Bilddaten als Bytes
-        model: Ollama-Modell für Bildanalyse
-        custom_prompt: Benutzerdefinierter Prompt
+        model: Hugging Face Modell-Name
+        custom_prompt: Benutzerdefinierter Prompt (wird als Conditional Text verwendet)
     
     Returns:
         str: Analyseergebnis oder Fehlermeldung
     """
-    # Bild zu Base64 konvertieren
-    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
-    
-    if not custom_prompt:
-        custom_prompt = "Analysiere dieses Bild medizinisch. Beschreibe was du siehst und gib Hinweise auf mögliche medizinische Befunde. Antworte auf Deutsch."
-    
     try:
-        ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
-        response = requests.post(
-            f"{ollama_url}/api/generate",
-            json={
-                "model": model,
-                "prompt": custom_prompt,
-                "images": [image_base64],
-                "stream": False
-            },
-            timeout=600
-        )
-        response.raise_for_status()
-        result = response.json()
-        return result.get("response", "Keine Antwort vom Modell erhalten.")
+        # Bild laden
+        image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+        
+        # Modell laden
+        processor, model_instance = load_model(model)
+        
+        # Bild verarbeiten (ohne Text für unconditional generation)
+        inputs = processor(image, return_tensors="pt")
+        
+        # GPU verwenden falls verfügbar
+        if torch.cuda.is_available():
+            inputs = {k: v.cuda() for k, v in inputs.items()}
+        
+        # Generierung
+        with torch.no_grad():
+            out = model_instance.generate(**inputs, max_length=150, num_beams=5, early_stopping=True)
+        
+        # Ergebnis dekodieren
+        result = processor.decode(out[0], skip_special_tokens=True)
+        
+        return result
+        
     except Exception as e:
         return f"Fehler bei Bildanalyse: {e}"
