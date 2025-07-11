@@ -25,7 +25,8 @@ HF_VISION_MODELS = [
     "Salesforce/blip-image-captioning-base",
     "Salesforce/blip-image-captioning-large",
     "microsoft/git-base",
-    "microsoft/git-large"
+    "microsoft/git-large",
+    "google/medgemma-4b-it"
 ]
 
 @st.cache_data(ttl=60)
@@ -194,6 +195,14 @@ elif menu_option == "image_analysis":
         with col1:
             hf_models = get_hf_vision_models()
             selected_image_model = st.selectbox(t("available_vision_models", language), hf_models)
+            
+            # HF Login für geschützte Modelle
+            if "google/medgemma" in selected_image_model:
+                hf_token = st.text_input("Hugging Face Token (für MedGemma erforderlich)", type="password")
+                if hf_token:
+                    os.environ["HF_TOKEN"] = hf_token
+            
+
         
         with col2:
             if "image_llm_running" not in st.session_state:
