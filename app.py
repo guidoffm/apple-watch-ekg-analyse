@@ -20,6 +20,8 @@ def t(key, lang='de', **kwargs):
     text = texts.get(lang, {}).get(key, key)
     return text.format(**kwargs) if kwargs else text
 
+VISION_MODELS = {"llava", "bakllava", "llava-phi3", "llava-llama3", "medgemma", "medllava"}
+
 @st.cache_data(ttl=60)
 def get_ollama_models():
     try:
@@ -30,6 +32,9 @@ def get_ollama_models():
         return sorted([model["name"] for model in models])
     except:
         return ["llama3"]
+
+def filter_vision_models(models):
+    return [m for m in models if any(vm in m.lower() for vm in VISION_MODELS)]
 
 # Sprachauswahl mit Browser-Speicherung
 if 'language' not in st.session_state:
@@ -179,8 +184,7 @@ elif menu_option == "image_analysis":
         
         with col1:
             available_models = get_ollama_models()
-            # Vision-Modelle bevorzugen
-            vision_models = [m for m in available_models if 'llava' in m.lower() or 'vision' in m.lower()]
+            vision_models = filter_vision_models(available_models)
             if not vision_models:
                 vision_models = available_models
             selected_image_model = st.selectbox(t("available_vision_models", language), vision_models)
