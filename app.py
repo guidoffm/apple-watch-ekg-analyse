@@ -22,10 +22,6 @@ def t(key, lang='de', **kwargs):
 
 VISION_MODELS = {"llava", "bakllava", "llava-phi3", "llava-llama3", "medgemma", "medllava"}
 HF_VISION_MODELS = [
-    "Salesforce/blip-image-captioning-base",
-    "Salesforce/blip-image-captioning-large",
-    "microsoft/git-base",
-    "microsoft/git-large",
     "google/medgemma-4b-it"
 ]
 
@@ -69,7 +65,7 @@ st.title("Medical Analysis Platform")
 # Hauptmenü
 menu_option = st.selectbox(
     t("menu_select", language),
-    options=["ekg_analysis", "image_analysis"],
+    options=["image_analysis", "ekg_analysis"],
     format_func=lambda x: {
         "ekg_analysis": t("menu_ekg", language),
         "image_analysis": t("menu_image", language)
@@ -196,11 +192,23 @@ elif menu_option == "image_analysis":
             hf_models = get_hf_vision_models()
             selected_image_model = st.selectbox(t("available_vision_models", language), hf_models)
             
-            # HF Login für geschützte Modelle
-            if "google/medgemma" in selected_image_model:
-                hf_token = st.text_input("Hugging Face Token (für MedGemma erforderlich)", type="password")
-                if hf_token:
+            # HF Token Management
+            if 'hf_token' not in st.session_state:
+                st.session_state.hf_token = ""
+            
+            # Token nur anzeigen wenn nicht vorhanden oder Test fehlschlägt
+            show_token_input = not st.session_state.hf_token or st.session_state.get('token_failed', False)
+            
+            if show_token_input:
+                hf_token = st.text_input("Hugging Face Token (für MedGemma erforderlich)", 
+                                       value=st.session_state.hf_token, 
+                                       type="password")
+                if hf_token and hf_token != st.session_state.hf_token:
+                    st.session_state.hf_token = hf_token
+                    st.session_state.token_failed = False
                     os.environ["HF_TOKEN"] = hf_token
+            else:
+                os.environ["HF_TOKEN"] = st.session_state.hf_token
             
 
         
@@ -222,7 +230,16 @@ elif menu_option == "image_analysis":
             with st.spinner(t("image_analysis_running", language, model=selected_image_model)):
                 image_bytes = uploaded_image.read()
                 corrected_bytes = fix_image_orientation(image_bytes)
-                llm_result = analyze_image_with_llm(corrected_bytes, model=selected_image_model, custom_prompt=custom_image_prompt)
-                st.session_state.image_llm_running = False
-                st.write(f"**{t('image_analysis_results', language)}**")
-                st.write(llm_result)
+                try:
+                    llm_result = analyze_image_with_llm(corrected_bytes, model=selected_image_model, custom_prompt=custom_image_prompt)
+                    st.write(f"**{t('image_analysis_results', language)}**")
+                    st.write(llm_result)
+                    st.session_state.token_failed = False
+                except Exception as e:
+                    if "token" in str(e).lower() or "authentication" in str(e).lower():
+                        st.session_state.token_failed = True
+                        st.error("HF Token ungültig. Bitte geben Sie einen gültigen Token ein.")
+                    else:
+                        st.error(f"Fehler: {e}")
+                finally:
+                    st.session_state.image_llm_running = False
